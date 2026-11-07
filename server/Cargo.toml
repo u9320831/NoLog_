@@ -1,0 +1,12 @@
+[package]
+name = "nolog-server"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+chacha20poly1305 = { version = "0.11", default-features = false, features = ["alloc", "zeroize"] }
+windows-sys = { version = "0.59", features = [
+    "Win32_Foundation",
+    "Win32_Security_Cryptography",
+] }
+zeroize = { version = "1", default-features = false, features = ["alloc"] }

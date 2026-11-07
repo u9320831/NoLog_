@@ -1,0 +1,9 @@
+.git
+.gitignore
+.secrets
+deploy/.secrets
+target
+**/target
+*.pdb
+*.dll
+vendor-vbs-enclave-rs/.git

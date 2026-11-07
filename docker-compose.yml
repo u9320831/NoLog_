@@ -1,0 +1,84 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: nolog
+      POSTGRES_USER: nolog_server
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+    secrets:
+      - postgres_password
+    ports:
+      - 127.0.0.1:5432:5432
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./deploy/postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nolog_server -d nolog"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - nolog-internal
+
+  dashboard:
+    build:
+      context: .
+      dockerfile: deploy/dashboard/Dockerfile
+    image: nolog/dashboard:local
+    restart: unless-stopped
+    environment:
+      NOLOG_DASHBOARD_BIND: 0.0.0.0:8080
+      NOLOG_DASHBOARD_TOKEN_FILE: /run/secrets/dashboard_token
+      NOLOG_INGEST_TOKEN_FILE: /run/secrets/ingest_token
+    secrets:
+      - dashboard_token
+      - ingest_token
+    ports:
+      - 127.0.0.1:8080:8080
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    networks:
+      - nolog-internal
+
+  tor:
+    profiles: ["tor"]
+    build:
+      context: .
+      dockerfile: deploy/tor/Dockerfile
+    image: nolog/tor:local
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp
+    volumes:
+      - tor-data:/var/lib/tor
+    ports:
+      - 127.0.0.1:9050:9050
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    networks:
+      - nolog-internal
+
+volumes:
+  postgres-data:
+  tor-data:
+
+networks:
+  nolog-internal:
+    driver: bridge
+
+secrets:
+  postgres_password:
+    file: ./deploy/.secrets/postgres_password
+  dashboard_token:
+    file: ./deploy/.secrets/dashboard_token
+  ingest_token:
+    file: ./deploy/.secrets/ingest_token

@@ -1,0 +1,8 @@
+/target
+/deploy/.secrets/
+**/target/
+*.pfx
+*.p12
+*.key
+*.pem
+/TorNewNym.dll

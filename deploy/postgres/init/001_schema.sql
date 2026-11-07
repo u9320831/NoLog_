@@ -1,0 +1,10 @@
+CREATE TABLE IF NOT EXISTS nolog_secret_records (
+    secret_id TEXT PRIMARY KEY,
+    ciphertext BYTEA NOT NULL,
+    nonce BYTEA NOT NULL,
+    key_version INTEGER NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+REVOKE ALL ON TABLE nolog_secret_records FROM PUBLIC;
