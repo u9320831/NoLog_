@@ -50,6 +50,28 @@ le même :
 | `dashboard/` | statistiques agrégées sans contenu confidentiel |
 | `deploy/` | PostgreSQL, dashboard, Tor optionnel et scripts Windows |
 
+## Récupérer `vendor-vbs-enclave-rs`
+
+Le runtime Microsoft `vbs-enclave-rs` est une dépendance externe. Si le dossier
+`vendor-vbs-enclave-rs/` n’est pas présent après le clonage de NoLog, le
+recréer avec PowerShell :
+
+```powershell
+git clone https://github.com/microsoft/vbs-enclave-rs.git vendor-vbs-enclave-rs
+git -C vendor-vbs-enclave-rs checkout 35f0ff863a7a09dd2bc0a0f026dda6171c67a7e1
+```
+
+Puis vérifier la dépendance avant de compiler :
+
+```powershell
+Test-Path .\vendor-vbs-enclave-rs\Cargo.toml
+cargo check --workspace
+```
+
+Le commit est épinglé pour rendre la compilation reproductible. Ne pas
+committer le dossier `.git` interne du vendor dans le dépôt NoLog ; seuls ses
+fichiers sources sont nécessaires.
+
 ## Démarrage rapide avec Docker
 
 Depuis la racine du dépôt :
